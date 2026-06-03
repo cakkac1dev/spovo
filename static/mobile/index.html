@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#09090b" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <title>SPOVO</title>
+  <script>try{var t=localStorage.getItem('spovo-theme');if(t==='light'||t==='dark')document.documentElement.className=t;}catch(e){}</script>
+  <link rel="stylesheet" href="/mobile/style.css" />
+  <link rel="stylesheet" href="/kall-extra.css" />
+</head>
+<body class="mobile">
+  <div id="bg-blur"></div>
+  <div id="toast"></div>
+
+  <div id="auth-screen" class="auth-screen" style="display:none">
+    <div class="auth-card">
+      <div class="logo auth-logo">SPOVO</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Вход</button>
+        <button class="auth-tab" data-tab="register">Регистрация</button>
+      </div>
+      <input id="auth-username" type="text" placeholder="Имя пользователя" autocomplete="username" />
+      <input id="auth-password" type="password" placeholder="Пароль" autocomplete="current-password" />
+      <div id="auth-error" class="auth-error"></div>
+      <button id="auth-submit" class="auth-submit">Войти</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <header class="m-header">
+      <div class="logo">SPOVO</div>
+      <div class="m-header-right">
+        <button id="search-open" class="icon-round" title="Поиск"><span class="ic" data-icon="search"></span></button>
+        <button id="queue-open" class="icon-round" title="Очередь"><span class="ic" data-icon="list"></span></button>
+        <button id="eq-open" class="icon-round" title="Эквалайзер"><span class="ic" data-icon="sliders"></span></button>
+        <button id="theme-toggle" class="icon-round" title="Тема"></button>
+        <button id="logout-btn" class="icon-round" title="Выйти"><span class="ic" data-icon="logout"></span></button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="view-search" class="view" style="display:none">
+        <div class="search-bar-big">
+          <span class="ic search-ic" data-icon="search"></span>
+          <input id="search-input" type="search" placeholder="Что хочешь послушать?" autocomplete="off" enterkeyhint="search" />
+        </div>
+        <div class="src-scroll">
+          <div class="src-toggle">
+            <button class="src on" data-src="all">Все</button>
+            <button class="src" data-src="youtube">YouTube</button>
+            <button class="src" data-src="soundcloud">SoundCloud</button>
+            <button class="src" data-src="spotify">Spotify</button>
+          </div>
+        </div>
+        <div id="results" class="track-list"></div>
+      </section>
+
+      <section id="view-home" class="view">
+        <div id="home-blocks"></div>
+      </section>
+
+      <section id="view-wave" class="view" style="display:none">
+        <div class="wave-hero">
+          <h2>Волна</h2>
+          <button id="wave-toggle" class="wave-start">Плывём</button>
+          <div id="wave-status" class="wave-badge"></div>
+        </div>
+        <div id="wave-tracks" class="track-list"></div>
+      </section>
+
+      <section id="view-radio" class="view" style="display:none">
+        <div class="wave-hero radio-hero">
+          <h2 id="radio-title">Радио</h2>
+          <div id="radio-status" class="wave-badge"></div>
+        </div>
+        <div id="radio-tracks" class="track-list"></div>
+      </section>
+
+      <section id="view-library" class="view" style="display:none">
+        <input id="lib-filter" class="lib-filter" type="search" placeholder="Поиск в избранном…" />
+        <div class="lib-head"><h2>Избранное</h2><span id="fav-count" class="muted-sm"></span></div>
+        <div id="favorites" class="track-list"></div>
+        <div class="section-head"><h3>Недавно</h3></div>
+        <div id="history" class="track-list"></div>
+        <div class="lib-head" style="margin-top:24px"><h2>Плейлисты</h2>
+          <button id="new-playlist" class="mini-btn"><span class="ic" data-icon="plus"></span> Новый</button>
+        </div>
+        <div id="playlists" class="playlist-grid"></div>
+        <div id="playlist-detail" style="display:none"></div>
+      </section>
+
+      <section id="view-downloads" class="view" style="display:none">
+        <div class="lib-head"><h2>Загрузки</h2><span id="dl-count" class="muted-sm"></span></div>
+        <div id="dl-hint" class="hint" style="display:none">Скачивание работает только в приложении SPOVO.</div>
+        <div id="dl-offline-badge" class="wave-badge" style="display:none">Офлайн-режим — играют только скачанные треки</div>
+        <div id="downloads-list" class="track-list"></div>
+      </section>
+
+      <section id="view-spotify" class="view" style="display:none">
+        <div class="hint">Spotify — нужен Premium + Client ID.</div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-view="home"><span class="ic" data-icon="home"></span><span>Главное</span></button>
+      <button class="nav-item" data-view="wave"><span class="ic" data-icon="wave"></span><span>Волна</span></button>
+      <button class="nav-item" data-view="radio"><span class="ic" data-icon="radio"></span><span>Радио</span></button>
+      <button class="nav-item" data-view="library"><span class="ic" data-icon="library"></span><span>Моё</span></button>
+      <button class="nav-item nav-downloads" data-view="downloads" style="display:none"><span class="ic" data-icon="download"></span><span>Загрузки</span></button>
+      <button class="nav-item" data-view="spotify"><span class="ic" data-icon="spotify"></span><span>Spotify</span></button>
+    </nav>
+  </div>
+
+  <footer class="player">
+    <div class="player-top">
+      <div class="np-art-wrap">
+        <span class="np-art-ph" data-icon="music"></span>
+        <img id="np-art" class="np-art" alt="" onerror="this.style.display='none'" />
+        <span class="playing-bars np-playing-bars"><i></i><i></i><i></i><i></i></span>
+      </div>
+      <div class="np-meta">
+        <div id="np-title" class="np-title">—</div>
+        <div id="np-artist" class="np-artist"></div>
+      </div>
+      <button id="np-radio" class="fav-btn np-radio" title="Радио по треку" data-icon="radio"></button>
+      <button id="np-dl" class="fav-btn np-dl" title="Скачать" data-icon="download" style="display:none"></button>
+      <button id="np-fav" class="fav-btn" title="В избранное" data-icon="heart"></button>
+    </div>
+    <div class="progress">
+      <span id="cur">0:00</span>
+      <input id="seek" type="range" min="0" max="100" value="0" step="0.1" />
+      <span id="dur">0:00</span>
+    </div>
+    <div class="controls">
+      <button id="shuffle" class="cbtn small" title="Перемешать" data-icon="shuffle"></button>
+      <button id="prev" class="cbtn" title="Назад" data-icon="prev"></button>
+      <button id="play" class="cbtn play" title="Играть" data-icon="play"></button>
+      <button id="next" class="cbtn" title="Вперёд" data-icon="next"></button>
+      <button id="repeat" class="cbtn small" title="Повтор" data-icon="repeat"></button>
+    </div>
+    <div class="vol-row">
+      <span class="ic vol-ic" data-icon="volume"></span>
+      <input id="vol" type="range" min="0" max="1" step="0.005" value="0.7" />
+      <select id="quality" class="quality-select" title="Качество">
+        <option value="auto">Авто</option>
+        <option value="high">HQ</option>
+        <option value="low">Eco</option>
+      </select>
+    </div>
+  </footer>
+
+  <div id="eq-modal" class="modal" style="display:none">
+    <div class="modal-card eq-card">
+      <div class="modal-head"><h3>Эквалайзер</h3><button id="eq-close" class="x" data-icon="close"></button></div>
+      <div class="eq-row"><label class="toggle"><input type="checkbox" id="eq-enabled" /><span class="toggle-track"><span class="toggle-knob"></span></span><span class="toggle-label">Включить</span></label></div>
+      <div id="eq-presets" class="preset-chips"></div>
+      <div id="eq-bands" class="eq-bands"></div>
+    </div>
+  </div>
+
+  <div id="queue-modal" class="modal queue-modal" style="display:none">
+    <div class="modal-card">
+      <div class="modal-head"><h3>Очередь</h3><button id="queue-close" class="x" data-icon="close"></button></div>
+      <div id="queue-list" class="queue-list"></div>
+    </div>
+  </div>
+
+  <div id="ctx-menu" class="ctx-menu" style="display:none"></div>
+  <audio id="audio" crossorigin="anonymous" playsinline></audio>
+  <script src="/kall-app.js"></script>
+</body>
+</html>

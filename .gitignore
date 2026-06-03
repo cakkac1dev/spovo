@@ -1,0 +1,26 @@
+# secrets & local state
+.secret
+config.json
+cookies.txt
+users.db
+*.db
+data.json
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# android build output
+android-app/.gradle/
+android-app/app/build/
+android-app/build/
+*.apk
+
+# editor / OS
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
