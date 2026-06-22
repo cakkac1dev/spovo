@@ -1,95 +1,96 @@
-# 🎵 SPOVO — self-hosted music streaming
+# 🎵 SPOVO — музыкальный стриминг на своём сервере
 
-A Spotify-style music streaming service you run yourself. Search and stream from
-**YouTube Music** and **SoundCloud** in one place, build playlists, get a personal
-radio ("Моя волна"), and listen on desktop, mobile web, or an installable PWA /
-Android app — all backed by a single Python server.
+Музыкальный стриминг в стиле Spotify, который ты хостишь сам. Ищи и слушай из
+**YouTube Music** и **SoundCloud** в одном месте, собирай плейлисты, получай личное
+радио («Моя волна») и слушай на десктопе, в мобильном вебе или через устанавливаемую
+PWA / Android-приложение — всё работает на одном Python-сервере.
 
-> Personal project. Built to learn full-stack audio streaming, PWA packaging and
-> self-hosting end-to-end.
+> Личный проект. Сделан, чтобы освоить full-stack аудио-стриминг, упаковку в PWA и
+> самостоятельный хостинг от и до.
 
-## ✨ Features
+## ✨ Возможности
 
-- 🔎 **Unified search** across YouTube Music + SoundCloud (via `yt-dlp`, no API key)
-- ▶️ **Full streaming** with a dark, Spotify-like player UI
-- 📻 **"Моя волна"** personal radio powered by `ytmusicapi`
-- 📚 **Accounts** — register/login, per-user library, playlists, favorites, history
-- 🎚️ Equalizer, play queue, listening history
-- 📱 **One URL, two UIs** — desktop and mobile layouts auto-detected (`?mobile=1` / `?desktop=1` to force)
-- 💾 **Installable PWA** (manifest + service worker) and a WebView **Android app** (`android-app/`)
-- 🔐 Sessions via signed cookies; passwords hashed with Werkzeug
+- 🔎 **Единый поиск** по YouTube Music + SoundCloud (через `yt-dlp`, без API-ключа)
+- ▶️ **Полноценный стриминг** с тёмным плеером в стиле Spotify
+- 📻 **«Моя волна»** — личное радио на `ytmusicapi`
+- 📚 **Аккаунты** — регистрация/вход, своя библиотека, плейлисты, избранное, история
+- 🎚️ Эквалайзер, очередь воспроизведения, история прослушиваний
+- 📱 **Один URL — два интерфейса** — десктоп и мобайл определяются автоматически (`?mobile=1` / `?desktop=1` чтобы задать вручную)
+- 💾 **Устанавливаемая PWA** (manifest + service worker) и **Android-приложение** на WebView (`android-app/`)
+- 🔐 Сессии через подписанные cookie; пароли хешируются Werkzeug
 
-## 🧱 Tech stack
+## 🧱 Стек
 
-| Layer | Tech |
+| Слой | Технология |
 |-------|------|
-| Backend | Python, Flask, `yt-dlp`, `ytmusicapi` |
-| Storage | SQLite (accounts), JSON (library) |
-| Frontend | Vanilla JS, HTML, CSS (no framework) |
-| Packaging | PWA (service worker), Android WebView (Gradle) |
+| Бэкенд | Python, Flask, `yt-dlp`, `ytmusicapi` |
+| Хранилище | SQLite (аккаунты), JSON (библиотека) |
+| Фронтенд | Ванильный JS, HTML, CSS (без фреймворков) |
+| Упаковка | PWA (service worker), Android WebView (Gradle) |
 
-## 🚀 Run locally
+## 🚀 Запуск локально
 
 ```bash
-# 1. install dependencies
+# 1. установить зависимости
 pip install flask yt-dlp ytmusicapi werkzeug
 
-# 2. start the server
+# 2. запустить сервер
 python server.py
 
-# 3. open the app
+# 3. открыть приложение
 #    http://localhost:8765
 ```
 
-The same URL serves the desktop UI on a computer and the mobile UI on a phone.
+Один и тот же URL отдаёт десктопный интерфейс на компьютере и мобильный — на телефоне.
 
-### Configuration
+### Настройка
 
-Optional Spotify metadata enrichment:
+Опциональное обогащение метаданными из Spotify:
 
 ```bash
 cp config.example.json config.json
-# then put your Spotify client id into config.json
+# затем впиши свой Spotify client id в config.json
 ```
 
-The session secret (`.secret`), the accounts DB (`users.db`) and your library
-(`data.json`) are created automatically on first run and are **git-ignored**.
+Секрет сессии (`.secret`), база аккаунтов (`users.db`) и твоя библиотека
+(`data.json`) создаются автоматически при первом запуске и **не попадают в git**.
 
-## 📡 Sharing over the internet
+## 📡 Доступ через интернет
 
-For a quick demo you can expose the local server with a tunnel
-(e.g. `ngrok http 8765`) and send the link to a friend — they open it, register,
-and listen. For a permanent setup, see the deploy notes below.
+Для быстрой демонстрации можно открыть локальный сервер туннелем
+(например `ngrok http 8765`) и отправить ссылку другу — он откроет, зарегистрируется
+и слушает. Для постоянного варианта — см. заметки по деплою ниже.
 
-## 🖥️ Deploy to a VPS
+## 🖥️ Деплой на VPS
 
-A reference setup lives in [`deploy/setup.sh`](deploy/setup.sh). The short version:
+Эталонная настройка — в [`deploy/setup.sh`](deploy/setup.sh). Кратко:
 
 ```bash
-# on the server
+# на сервере
 sudo apt update && sudo apt install -y python3-pip
 pip3 install flask yt-dlp ytmusicapi werkzeug
-# copy the project to /opt/spovo, then run server.py under systemd
-# put Nginx in front for HTTPS on port 80/443 -> 8765
+# скопируй проект в /opt/spovo, затем запусти server.py под systemd
+# поставь Nginx спереди для HTTPS на порту 80/443 -> 8765
 ```
 
-## 📁 Project layout
+## 📁 Структура проекта
 
 ```
 spovo/
-├── server.py              # Flask backend: search, streaming, accounts, radio
-├── config.example.json    # optional Spotify client id template
-├── data.example.json      # empty library seed (favorites/playlists/history)
-├── static/                # desktop UI (index.html, app.js, style.css)
-│   ├── mobile/            # mobile UI
-│   ├── icons/             # PWA icons
-│   ├── manifest.json      # PWA manifest
+├── server.py              # Flask-бэкенд: поиск, стриминг, аккаунты, радио
+├── config.example.json    # шаблон для опционального Spotify client id
+├── data.example.json      # пустая заготовка библиотеки (избранное/плейлисты/история)
+├── static/                # десктопный UI (index.html, app.js, style.css)
+│   ├── mobile/            # мобильный UI
+│   ├── icons/             # иконки PWA
+│   ├── manifest.json      # манифест PWA
 │   └── sw.js              # service worker
-├── android-app/           # Android WebView wrapper (Gradle)
-└── deploy/setup.sh        # VPS deployment reference
+├── android-app/           # Android-обёртка на WebView (Gradle)
+└── deploy/setup.sh        # эталон деплоя на VPS
 ```
 
-## ⚖️ Disclaimer
+## ⚖️ Дисклеймер
 
-Built for personal/educational use. Streaming pulls from third-party sources via
-`yt-dlp`; respect the terms of service and copyright laws in your country.
+Сделано для личного/образовательного использования. Стриминг тянет контент из
+сторонних источников через `yt-dlp`; соблюдай условия использования сервисов и
+законы об авторском праве в своей стране.
